@@ -176,7 +176,7 @@ class Saveinputdata extends Component
                 'company_address' => $this->company_address,
                 'company_iv_desc' => $this->company_iv_desc,
                 'company_photos' => $this->company_photos,
-                'company_main_photo' => $mainPhotoPath,
+                'company_main_photo' => $this->mainPhotoPath,
             ]);
 
             // Flash success message
