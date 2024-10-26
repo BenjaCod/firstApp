@@ -27,8 +27,8 @@ class Saveinputdata extends Component
     public $company_code;
     public $company_address;
     public $company_iv_desc;
-    public $company_photos = [];
-    public $company_main_photo;
+    // public $company_photos = [];
+    // public $company_main_photo;
     
     
     public function mount() 
@@ -77,8 +77,8 @@ class Saveinputdata extends Component
             'company_code' => 'max:15|nullable',
             'company_address' => 'max:50|nullable',
             'company_iv_desc' => 'max:50|nullable',
-            'company_photos.*' => 'image|max:2048|nullable',
-            'company_main_photo' => 'image|max:2048|nullable'
+            // 'company_photos.*' => 'image|max:2048|nullable',
+            // 'company_main_photo' => 'image|max:2048|nullable'
         ]);
 
         // Check if the authenticated user already created a row in CompanyInfo table
@@ -86,29 +86,29 @@ class Saveinputdata extends Component
 
         // FOR GALLERY PHOTOS
 
-        if($this->company_photos){
-            $uploadedPhotos = [];
-            foreach ($this->company_photos as $photo) {
-                $uploadedPhotos[] = $photo->store('company_photos', 'public'); // Store photos in 'public/company_photos' folder
-            }
-            $companyInfo->company_photos = $uploadedPhotos; // Save photo paths to the database
-            $this->company_photos = json_encode($uploadedPhotos);
-        } else {
-            // Handle the case where the photo is not uploaded
-            session()->flash('error', 'Error.');
-        }
+        // if($this->company_photos){
+        //     $uploadedPhotos = [];
+        //     foreach ($this->company_photos as $photo) {
+        //         $uploadedPhotos[] = $photo->store('company_photos', 'public'); // Store photos in 'public/company_photos' folder
+        //     }
+        //     $companyInfo->company_photos = $uploadedPhotos; // Save photo paths to the database
+        //     $this->company_photos = json_encode($uploadedPhotos);
+        // } else {
+        //     // Handle the case where the photo is not uploaded
+        //     session()->flash('error', 'Error.');
+        // }
 
-        // FOR MAIN PHOTO
+        // // FOR MAIN PHOTO
 
-        if ($this->company_main_photo) {
-            // Store the main photo and get its path
-            $mainPhotoPath = $this->company_main_photo->store('company_main_photo', 'public'); 
-            // Save the path to the database
-            $companyInfo->company_main_photo = $mainPhotoPath; 
-        } else {
-            // Handle the case where the photo is not uploaded
-            session()->flash('error', 'Error.');
-        }
+        // if ($this->company_main_photo) {
+        //     // Store the main photo and get its path
+        //     $mainPhotoPath = $this->company_main_photo->store('company_main_photo', 'public'); 
+        //     // Save the path to the database
+        //     $companyInfo->company_main_photo = $mainPhotoPath; 
+        // } else {
+        //     // Handle the case where the photo is not uploaded
+        //     session()->flash('error', 'Error.');
+        // }
 
 
 
@@ -147,8 +147,8 @@ class Saveinputdata extends Component
                 'company_code' => $this->company_code,
                 'company_address' => $this->company_address,
                 'company_iv_desc' => $this->company_iv_desc,
-                'company_photos' => $this->company_photos,
-                'company_main_photo' => $companyInfo->company_main_photo,
+                // 'company_photos' => $this->company_photos,
+                // 'company_main_photo' => $companyInfo->company_main_photo,
             ]);
 
             // Flash success message
@@ -175,8 +175,8 @@ class Saveinputdata extends Component
                 'company_code' => $this->company_code,
                 'company_address' => $this->company_address,
                 'company_iv_desc' => $this->company_iv_desc,
-                'company_photos' => $this->company_photos,
-                'company_main_photo' => $this->mainPhotoPath,
+                // 'company_photos' => $this->company_photos,
+                // 'company_main_photo' => $mainPhotoPath,
             ]);
 
             // Flash success message

@@ -96,7 +96,7 @@
             <input wire:model="company_iv_desc" type="number" id="company_iv_desc" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Individualios veilkos pažymėjimo numeris (neprivaloma)" />
             </div>
             
-            <div>
+            <!-- <div>
             <label for="company_image" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Įkelkite galerijos nuotraukas</label>
             <input multiple wire:model="company_photos" type="file" id="company_image" accept="image/png, image/jpeg" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
             </div>
@@ -104,7 +104,7 @@
             <div>
             <label for="company_main_image" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Įkelkite pagrindinę nuotrauką</label>
             <input wire:model="company_main_photo" type="file" id="company_main_image" accept="image/png, image/jpeg" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-            </div>
+            </div> -->
         
             <br>
             <button 
