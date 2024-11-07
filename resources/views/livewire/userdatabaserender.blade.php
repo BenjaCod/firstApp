@@ -18,9 +18,9 @@
     <!-- HEADERIS, ESMINE INFORMACIJA -->
     <div class="flex justify-start gap-10 align-middle">
     @if($companyInfo->company_main_photo)
-        <img src="{{ asset('storage/' . $companyInfo->company_main_photo) }}" class="block max-w-24 rounded-md" alt="">
+        <img src="{{ asset('storage/' . $companyInfo->company_main_photo) }}" class="block max-w-24 rounded-md" alt="Main Photo">
     @endif
-    </div>
+</div>
     <div class="grid grid-cols-1 md:grid-cols-3">
             <h1 class="text-4xl mt-10 font-bold tracking-tight text-zinc-800 col-span-2 sm:text-5xl">{{ $companyInfo->company_headline }}</h1>
             <p class="my-6 text-base/7 text-zinc-600 col-span-2">{{ $companyInfo->company_short_description }}<p>

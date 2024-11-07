@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Userdatabaserender;
 
-if(false){
+$maintenanceSet = false;
+
+if(!$maintenanceSet){
     Route::view('/', 'home');
 
     Route::view('dashboard', 'dashboard')
@@ -15,10 +17,8 @@ if(false){
         ->name('profile');
         
     Route::get('/c/{cname}', userdatabaserender::class);
+} else {
+    Route::view('/', 'maintenance');
 }
-
-// Maintenance mode:
-
-Route::view('/', 'maintenance');
 
 require __DIR__.'/auth.php';

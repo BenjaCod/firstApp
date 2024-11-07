@@ -4,7 +4,7 @@ namespace App\Livewire;
 use Livewire\WithFileUploads;
 use Livewire\Component;
 use App\Models\CompanyInfo; // Import model
-
+use Illuminate\Support\Facades\Storage; // Use storage
 use Illuminate\Support\Facades\Auth; // To get the authenticated user
 
 class Saveinputdata extends Component
@@ -27,8 +27,9 @@ class Saveinputdata extends Component
     public $company_code;
     public $company_address;
     public $company_iv_desc;
-    // public $company_photos = [];
-    // public $company_main_photo;
+    public $company_photos = [];
+    public $company_main_photo;
+    public $existingPhotos = [];
     
     
     public function mount() 
@@ -55,6 +56,16 @@ class Saveinputdata extends Component
             $this->company_address = $companyInfo->company_address;
             $this->company_iv_desc = $companyInfo->company_iv_desc;
         }
+
+
+            // Check if there are photos and load them
+            if ($companyInfo && !empty($companyInfo->company_photos)) {
+            // Decode company_photos if it's a JSON string, otherwise use it as-is
+            $this->existingPhotos = is_string($companyInfo->company_photos) 
+                ? json_decode($companyInfo->company_photos, true)
+                : $companyInfo->company_photos;
+            }
+
     }
 
     public function save()
@@ -77,8 +88,8 @@ class Saveinputdata extends Component
             'company_code' => 'max:15|nullable',
             'company_address' => 'max:50|nullable',
             'company_iv_desc' => 'max:50|nullable',
-            // 'company_photos.*' => 'image|max:2048|nullable',
-            // 'company_main_photo' => 'image|max:2048|nullable'
+            'company_photos.*' => 'image|max:2048|nullable',
+            'company_main_photo' => 'image|max:2048|nullable'
         ]);
 
         // Check if the authenticated user already created a row in CompanyInfo table
@@ -86,34 +97,56 @@ class Saveinputdata extends Component
 
         // FOR GALLERY PHOTOS
 
-        // if($this->company_photos){
-        //     $uploadedPhotos = [];
-        //     foreach ($this->company_photos as $photo) {
-        //         $uploadedPhotos[] = $photo->store('company_photos', 'public'); // Store photos in 'public/company_photos' folder
-        //     }
-        //     $companyInfo->company_photos = $uploadedPhotos; // Save photo paths to the database
-        //     $this->company_photos = json_encode($uploadedPhotos);
-        // } else {
-        //     // Handle the case where the photo is not uploaded
-        //     session()->flash('error', 'Error.');
-        // }
+                                        // Handle existing photos
+                                        if ($companyInfo && is_string($companyInfo->company_photos)) {
+                                            $existingPhotos = json_decode($companyInfo->company_photos, true);
+                                        } else {
+                                            $existingPhotos = [];
+                                        }
 
-        // // FOR MAIN PHOTO
+                                        // Delete old photos if new photos are uploaded
+                                        if ($this->company_photos && $existingPhotos) {
+                                            foreach ($existingPhotos as $oldPhoto) {
+                                                Storage::disk('public')->delete($oldPhoto);
+                                            }
+                                            $existingPhotos = []; // Clear out old photos since they’re deleted
+                                        }
 
-        // if ($this->company_main_photo) {
-        //     // Store the main photo and get its path
-        //     $mainPhotoPath = $this->company_main_photo->store('company_main_photo', 'public'); 
-        //     // Save the path to the database
-        //     $companyInfo->company_main_photo = $mainPhotoPath; 
-        // } else {
-        //     // Handle the case where the photo is not uploaded
-        //     session()->flash('error', 'Error.');
-        // }
+                                        // Upload new photos if provided
+                                        $uploadedPhotos = [];
+                                        if ($this->company_photos) {
+                                            foreach ($this->company_photos as $photo) {
+                                                $uploadedPhotos[] = $photo->store('company_photos', 'public');
+                                            }
+                                            $this->company_photos = array_merge($existingPhotos, $uploadedPhotos);
+                                        } else {
+                                            // Retain existing photos if no new ones are uploaded
+                                            $this->company_photos = $existingPhotos;
+                                        }
 
+        // FOR MAIN PHOTO
 
+                                        // Handle main photo
+                                        $mainPhotoPath = null; // Initialize main photo path
 
-            // $this->company_main_photo->store('company_main_photo', 'public'); // Store main photo in 'public/company_main_photo' folder
-            // $companyInfo->company_main_photo = $mainPhotoPath; // Save photo path to the database
+                                        // Check if a new photo has been uploaded
+                                        if ($this->company_main_photo) {
+                                            // If there is an existing company info, delete the old main photo if it exists
+                                            if ($companyInfo && $companyInfo->company_main_photo) {
+                                                Storage::disk('public')->delete($companyInfo->company_main_photo);
+                                            }
+                                            
+                                            // Store the new main photo
+                                            $mainPhotoPath = $this->company_main_photo->store('company_main_photo', 'public');
+                                        } else if ($companyInfo && $companyInfo->company_main_photo) {
+                                            // If no new photo is uploaded, retain the existing photo path
+                                            $mainPhotoPath = $companyInfo->company_main_photo;
+                                        }
+
+                                        // Update the company info with the new or retained main photo path
+                                        if ($companyInfo) {
+                                            $companyInfo->company_main_photo = $mainPhotoPath; // This will be null if no new photo is uploaded
+                                        }
 
 
         // Get ID of entered company name
@@ -147,12 +180,20 @@ class Saveinputdata extends Component
                 'company_code' => $this->company_code,
                 'company_address' => $this->company_address,
                 'company_iv_desc' => $this->company_iv_desc,
-                // 'company_photos' => $this->company_photos,
-                // 'company_main_photo' => $companyInfo->company_main_photo,
+                'company_photos' => json_encode($this->company_photos),
+                'company_main_photo' => $companyInfo->company_main_photo,
             ]);
 
             // Flash success message
             session()->flash('message', 'Duomenys atnaujinti sėkmingai!');
+
+                        // Check if there are photos and load them
+                        if ($companyInfo && !empty($companyInfo->company_photos)) {
+                            // Decode company_photos if it's a JSON string, otherwise use it as-is
+                            $this->existingPhotos = is_string($companyInfo->company_photos) 
+                                ? json_decode($companyInfo->company_photos, true)
+                                : $companyInfo->company_photos;
+                            }
         }
         else
         {
@@ -175,19 +216,46 @@ class Saveinputdata extends Component
                 'company_code' => $this->company_code,
                 'company_address' => $this->company_address,
                 'company_iv_desc' => $this->company_iv_desc,
-                // 'company_photos' => $this->company_photos,
-                // 'company_main_photo' => $mainPhotoPath,
+                'company_photos' => json_encode($this->company_photos),
+                'company_main_photo' => $mainPhotoPath,
             ]);
 
             // Flash success message
             session()->flash('message', 'Jūsų svetainė jau veikia!');
+
+                        // Check if there are photos and load them
+                        if ($companyInfo && !empty($companyInfo->company_photos)) {
+                            // Decode company_photos if it's a JSON string, otherwise use it as-is
+                            $this->existingPhotos = is_string($companyInfo->company_photos) 
+                                ? json_decode($companyInfo->company_photos, true)
+                                : $companyInfo->company_photos;
+                            }
+        }
+    }
+
+    public function deletePhoto($photoPath)
+    {
+        // Remove photo from storage
+        Storage::disk('public')->delete($photoPath);
+
+        // Remove photo from company_photos array
+        $this->company_photos = array_filter($this->company_photos, fn($photo) => $photo !== $photoPath);
+
+        // Update the company info in the database
+        $companyInfo = CompanyInfo::where('user_id', Auth::id())->first();
+        if ($companyInfo) {
+            $companyInfo->update(['company_photos' => json_encode($this->company_photos)]);
         }
 
-        // Reset the form field after submission
-        // $this->reset('name');
+                                // Check if there are photos and load them
+                                if ($companyInfo && !empty($companyInfo->company_photos)) {
+                                    // Decode company_photos if it's a JSON string, otherwise use it as-is
+                                    $this->existingPhotos = is_string($companyInfo->company_photos) 
+                                        ? json_decode($companyInfo->company_photos, true)
+                                        : $companyInfo->company_photos;
+                                    }
 
-        // Flash message
-        // session()->flash('message', 'Company name saved successfully!');
+        session()->flash('message', 'Nuotrauka ištrinta sėkmingai!');
     }
 
     public function render()
